@@ -35,57 +35,15 @@ class MLP(nn.Module):
         return self
 
 
-class GPS(nn.Module):
-    def __init__(
-        self, env, emb_dim, pe_dim=8, heads=2, num_layers=3, activation="leaky_relu"
-    ):
-        super().__init__()
-        self.env = env
-        self.emb_dim = emb_dim
-        self.num_layers = num_layers
-        self.transform = T.AddRandomWalkPE(walk_length=20, attr_name="pe")
-
-        self.pe_lin = nn.Linear(20, pe_dim)
-        self.pe_norm = nn.BatchNorm1d(20)
-
-        self.node2emb = nn.Embedding(self.env.num_node_types, emb_dim - pe_dim)
-        self.edge2emb = nn.Embedding(self.env.num_edge_types, emb_dim)
-
-        self.layers = nn.ModuleList()
-        for _ in range(num_layers):
-            net = nn.Sequential(
-                nn.Linear(emb_dim, emb_dim),
-                nn.ReLU(),
-                nn.Linear(emb_dim, emb_dim),
-            )
-            conv = gnn.GPSConv(emb_dim, gnn.GINEConv(net), heads=heads)
-            self.layers.append(conv)
-
-    def forward(self, g):
-        self.transform(g)
-        x_nt = self.node2emb(g.node_type)
-        x_pe = self.pe_norm(g.pe)
-        x = torch.cat([x_nt, self.pe_lin(x_pe)], 1)
-        edge_attr = self.edge2emb(g.edge_type)
-
-        for layer in self.layers:
-            x = layer(x, g.edge_index, g.batch, edge_attr=edge_attr)
-
-        return x
-
-
 class RGCN(nn.Module):
-    def __init__(self, env, emb_dim, num_layers=3, activation="leaky_relu"):
+    def __init__(self, num_node_types, num_edge_types, emb_dim, num_layers=3, activation="leaky_relu"):
         super().__init__()
-        self.env = env
-        self.emb_dim = emb_dim
         self.num_layers = num_layers
-
-        self.node2emb = nn.Embedding(self.env.num_node_types, emb_dim)
+        self.node2emb = nn.Embedding(num_node_types, emb_dim)
 
         self.layers = nn.ModuleList()
         for _ in range(num_layers):
-            conv = gnn.RGCNConv(emb_dim, emb_dim, self.env.num_edge_types, aggr="add")
+            conv = gnn.RGCNConv(emb_dim, emb_dim, num_edge_types, aggr="add")
             self.layers.append(conv)
 
         self.activation = getattr(F, activation)
