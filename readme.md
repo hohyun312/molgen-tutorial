@@ -18,3 +18,7 @@ Connect to jupyter server as follows.
 conda install jupyter notebook
 jupyter notebook
 ```
+
+# Demo
+
+![](./score-func-estim-demo.gif)

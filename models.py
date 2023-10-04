@@ -1,9 +1,7 @@
-import torch
 from torch import nn
 import torch.nn.functional as F
 
 from torch_geometric import nn as gnn
-import torch_geometric.transforms as T
 
 
 class MLP(nn.Module):
@@ -28,7 +26,7 @@ class MLP(nn.Module):
         for layer in self.layers[:-1]:
             output = self.activation(layer(output))
         return self.layers[-1](output)
-    
+
     def reset_parameters(self):
         for layer in self.layers:
             layer.reset_parameters()
@@ -36,7 +34,14 @@ class MLP(nn.Module):
 
 
 class RGCN(nn.Module):
-    def __init__(self, num_node_types, num_edge_types, emb_dim, num_layers=3, activation="leaky_relu"):
+    def __init__(
+        self,
+        num_node_types,
+        num_edge_types,
+        emb_dim,
+        num_layers=3,
+        activation="leaky_relu",
+    ):
         super().__init__()
         self.num_layers = num_layers
         self.node2emb = nn.Embedding(num_node_types, emb_dim)
@@ -54,10 +59,9 @@ class RGCN(nn.Module):
             x = layer(x, g.edge_index, g.edge_type)
             x = self.activation(x)
         return x
-    
+
     def reset_parameters(self):
         self.node2emb.reset_parameters()
         for layer in self.layers:
             layer.reset_parameters()
         return self
-        

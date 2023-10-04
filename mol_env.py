@@ -22,7 +22,7 @@ class NodeType(enum.Enum):
     I = enum.auto()
     Cl = enum.auto()
     Br = enum.auto()
-    
+
     def __repr__(self):
         return self.name
 
@@ -31,10 +31,9 @@ class EdgeType(enum.Enum):
     SINGLE = enum.auto()
     DOUBLE = enum.auto()
     TRIPLE = enum.auto()
-    
+
     def __repr__(self):
         return self.name
-
 
 
 @dataclass
@@ -168,14 +167,13 @@ class Trajectory:
         return f"{self.__class__.__name__}(size: {len(self)})"
 
 
-
 num_node_types = len(NodeType)
 num_edge_types = len(EdgeType)
 
 
-
 def initial_state():
     return State([NodeType.C])
+
 
 def step(state: State, action: Action):
     next_state, done = deepcopy(state), False
@@ -186,10 +184,11 @@ def step(state: State, action: Action):
     elif action.type == ActionType.AddEdge:
         next_state.add_edge(action.source, action.target, action.edge_type)
 
-    else: # ActionType.STOP
+    else:  # ActionType.STOP
         done = True
 
     return next_state, done
+
 
 def Action_to_idx(state: State, action: Action) -> int:
     y = None
@@ -216,6 +215,7 @@ def Action_to_idx(state: State, action: Action) -> int:
 
     return y
 
+
 def idx_to_Action(state: State, idx: int) -> Action:
     action = None
     if idx == 0:
@@ -238,6 +238,7 @@ def idx_to_Action(state: State, idx: int) -> Action:
 
     return action
 
+
 def to_Data(state: State) -> gd.Data:
     # edge_index
     edge_index = (
@@ -252,8 +253,7 @@ def to_Data(state: State) -> gd.Data:
     # types
     node_type = torch.LongTensor([n.value for n in state.node_types]) - 1
     edge_type = (
-        torch.LongTensor([e for n in state.edge_types for e in (n.value, n.value)])
-        - 1
+        torch.LongTensor([e for n in state.edge_types for e in (n.value, n.value)]) - 1
     )
 
     # non_edge_index
@@ -268,6 +268,7 @@ def to_Data(state: State) -> gd.Data:
         edge_type=edge_type,
         num_non_edges=num_non_edges,
     )
+
 
 def get_bfs_trajectory(state):
     # We start from the node with type C
@@ -332,4 +333,3 @@ def get_bfs_trajectory(state):
 
     actions.append(Action(ActionType.STOP))
     return Trajectory(states, actions)
-

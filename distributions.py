@@ -2,6 +2,7 @@ import torch
 from torch_scatter import scatter_log_softmax, scatter_max
 from mol_env import idx_to_Action, Action_to_idx
 
+
 class ActionCategorical:
     def __init__(self, states, logits, indices):
         assert logits.dtype == torch.float, "`logits` should be torch.float data type"
@@ -22,7 +23,8 @@ class ActionCategorical:
             actions
         ), f"size doesn't match, size {self.size}, got {len(actions)}"
         action_indices = torch.LongTensor(
-            [Action_to_idx(s, a) for s, a in zip(self.states, actions)])
+            [Action_to_idx(s, a) for s, a in zip(self.states, actions)]
+        )
         log_probs = scatter_log_softmax(self.logits, self.indices)
         return log_probs[action_indices + self._offsets]
 
@@ -36,6 +38,3 @@ class ActionCategorical:
 
     def __repr__(self):
         return f"{self.__class__.__name__}(size={self.size})"
-
-
-
