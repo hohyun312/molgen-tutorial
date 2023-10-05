@@ -1,24 +1,14 @@
-# Setup
+# Colab
 
-First, create new environment with python version 3.10.
-```
-conda create -n molgen python=3.10
-conda activate molgen
-```
+You can run Jupyter notebooks using the Colab link below.
 
-Download notebooks and install required packages.
-```
-git clone https://github.com/hohyun312/molgen-tutorial.git
-cd molgen-tutorial
-pip install -r requirements.txt
-```
+- [Colab link](https://colab.research.google.com/drive/1C2RrLyywedrERrkvaFpZRyHeKLOcVxVT)
 
-Connect to jupyter server as follows.
-```
-conda install jupyter notebook
-jupyter notebook
-```
+# Local
+
+If you would like to run on a local environment, see `requirements.txt` for dependencies. The codes were tested on Python version 3.10.
 
 # Demo
 
 ![](./score-func-estim-demo.gif)
+
